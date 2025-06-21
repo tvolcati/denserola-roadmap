@@ -7,8 +7,8 @@ export default function HomePage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Redireciona automaticamente para o roadmap de exemplo
-    router.push("/roadmaps/1")
+    // Redireciona automaticamente para o primeiro roadmap válido
+    router.push("/roadmaps/5511999887766")
   }, [router])
 
   return (

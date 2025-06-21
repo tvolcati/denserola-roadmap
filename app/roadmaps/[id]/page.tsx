@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation"
+import { PrismaClient } from "@prisma/client"
 import RoadmapTimeline from "../../../components/RoadmapTimeline"
+
+const prisma = new PrismaClient()
 
 interface MonthData {
   value_to_be_saved: number
@@ -19,21 +22,21 @@ interface RoadmapPageProps {
 }
 
 async function getRoadmapData(id: string) {
+  // Validar se o ID é um número de telefone válido de 13 dígitos
+  if (!/^\d{13}$/.test(id)) {
+    return null
+  }
+
   try {
-    // Fazer chamada real para a API
-    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/roadmaps/${id}`, {
-      cache: 'no-store' // Para sempre buscar dados atualizados
+    // Buscar diretamente no banco usando Prisma
+    const roadmap = await prisma.roadmap.findUnique({
+      where: { id: BigInt(id) },
     })
-    
-    if (!response.ok) {
-      console.error(`Erro na API: ${response.status} ${response.statusText}`)
+
+    if (!roadmap) {
       return null
-    }
-    
-    const data = await response.json()
-    
-    return {
-      data: data
+    }    return {
+      data: roadmap.data as unknown as RoadmapData
     }
   } catch (error) {
     console.error("Erro ao buscar roadmap:", error)
